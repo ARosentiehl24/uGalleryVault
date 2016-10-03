@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.arrg.android.app.ugalleryvault.view.activity.GalleryActivity">
+
+    <include layout="@layout/search_toolbar_layout" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/view_bottom_margin">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/gallery"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent" />
+
+            <include layout="@layout/view_empty" />
+
+            <include layout="@layout/view_loading" />
+
+            <include layout="@layout/view_error" />
+        </RelativeLayout>
+
+        <com.luseen.spacenavigation.SpaceNavigationView
+            android:layout_gravity="bottom"
+            android:id="@+id/spaceNavigationView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
+</LinearLayout>
