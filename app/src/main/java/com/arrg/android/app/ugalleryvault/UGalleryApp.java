@@ -1,9 +1,11 @@
 package com.arrg.android.app.ugalleryvault;
 
 import android.app.Application;
+import android.content.Context;
 import android.support.v4.content.ContextCompat;
 
 import com.example.jackmiras.placeholderj.library.PlaceHolderManager;
+import com.shawnlin.preferencesmanager.PreferencesManager;
 
 public class UGalleryApp extends Application {
 
@@ -11,9 +13,22 @@ public class UGalleryApp extends Application {
 
     public static Integer DURATIONS_OF_ANIMATIONS = 250;
 
+    public static String PACKAGE_NAME;
+
+    public static String SETTINGS_PREFERENCES;
+
+    private PreferencesManager preferencesManager;
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        PACKAGE_NAME = getPackageName().toUpperCase();
+
+        SETTINGS_PREFERENCES = PACKAGE_NAME + ".SETTINGS";
+
+        preferencesManager = new PreferencesManager(this);
+        setPreferencesManager(SETTINGS_PREFERENCES);
 
         placeHolderManager = new PlaceHolderManager.Configurator()
                 .emptyBackground(R.color.colorPrimary)
@@ -30,5 +45,11 @@ public class UGalleryApp extends Application {
 
     public static PlaceHolderManager getPlaceHolderManager() {
         return placeHolderManager;
+    }
+
+    public void setPreferencesManager(String name) {
+        preferencesManager.setName(name);
+        preferencesManager.setMode(Context.MODE_PRIVATE);
+        preferencesManager.init();
     }
 }

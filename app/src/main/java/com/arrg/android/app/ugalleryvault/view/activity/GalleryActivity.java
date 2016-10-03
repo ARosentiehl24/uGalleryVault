@@ -3,6 +3,8 @@ package com.arrg.android.app.ugalleryvault.view.activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
@@ -26,18 +28,24 @@ import com.arrg.android.app.ugalleryvault.interfaces.GalleryView;
 import com.arrg.android.app.ugalleryvault.presenter.IGalleryPresenter;
 import com.example.jackmiras.placeholderj.library.PlaceHolderJ;
 import com.jaouan.revealator.Revealator;
+import com.kennyc.bottomsheet.BottomSheet;
+import com.kennyc.bottomsheet.BottomSheetListener;
+import com.kennyc.bottomsheet.menu.BottomSheetMenuItem;
 import com.luseen.spacenavigation.SpaceItem;
 import com.luseen.spacenavigation.SpaceNavigationView;
 import com.luseen.spacenavigation.SpaceOnClickListener;
 import com.mukesh.permissions.AppPermissions;
+import com.shawnlin.preferencesmanager.PreferencesManager;
 
 import org.fingerlinks.mobile.android.navigator.Navigator;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.arrg.android.app.ugalleryvault.UGalleryApp.*;
+import static com.arrg.android.app.ugalleryvault.UGalleryApp.DURATIONS_OF_ANIMATIONS;
 
 public class GalleryActivity extends AppCompatActivity implements GalleryView, SpaceOnClickListener {
 
@@ -49,8 +57,10 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     };
 
     private AppPermissions appPermissions;
+    private Boolean isModePrivateEnabled = false;
     private Boolean isSearchViewDisplayed = false;
     private IGalleryPresenter iGalleryPresenter;
+    private List<ResolveInfo> infoList;
     private PlaceHolderJ placeHolderJ;
 
     @BindView(R.id.toolbar)
@@ -135,7 +145,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
         spaceNavigationView.addSpaceItem(new SpaceItem(getString(R.string.space_nv_item_home), R.drawable.ic_home_black_24dp));
         spaceNavigationView.addSpaceItem(new SpaceItem(getString(R.string.space_nv_item_favorite), R.drawable.ic_favorite_black_24dp));
         spaceNavigationView.addSpaceItem(new SpaceItem(getString(R.string.space_nv_item_search), R.drawable.ic_search_black_24dp));
-        spaceNavigationView.addSpaceItem(new SpaceItem(getString(R.string.space_nv_item_settings), R.drawable.ic_settings_black_24dp));
+        spaceNavigationView.addSpaceItem(new SpaceItem(getString(R.string.space_nv_item_edit), R.drawable.ic_edit_black_24dp));
 
         spaceNavigationView.setCentreButtonColor(ContextCompat.getColor(this, R.color.colorPrimary));
         spaceNavigationView.setCentreButtonIcon(R.drawable.ic_photo_camera_black_24dp);
@@ -150,6 +160,15 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
             showEmptyView();
         } else {
             appPermissions.requestPermission(STORAGE_PERMISSIONS, STORAGE_PERMISSION_RC);
+        }
+    }
+
+    @Override
+    public void switchSearchView() {
+        if (isSearchViewDisplayed) {
+            hideSearchView();
+        } else {
+            showSearchView();
         }
     }
 
@@ -220,57 +239,82 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
 
     @Override
     public void launchCamera() {
-        Intent imageCapture = new Intent(Intent.ACTION_CAMERA_BUTTON);
-        startActivity(imageCapture);
+        String defaultCamera = PreferencesManager.getString(getString(R.string.default_camera));
+
+        if (defaultCamera.length() != 0) {
+            launchPackage(defaultCamera);
+        } else {
+            BottomSheet.Builder cameraSelector = new BottomSheet.Builder(this);
+            Intent imageCapture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            Integer id = 0;
+
+            infoList = getPackageManager().queryIntentActivities(imageCapture, 0);
+
+            for (ResolveInfo resolveInfo : infoList) {
+                CharSequence name = resolveInfo.loadLabel(getPackageManager());
+                Drawable icon = resolveInfo.loadIcon(getPackageManager());
+
+                cameraSelector.addMenuItem(new BottomSheetMenuItem(this, id, name, icon));
+
+                id++;
+            }
+
+            cameraSelector.setTitle(R.string.select_camera_title);
+
+            if (infoList.size() > getResources().getInteger(R.integer.default_bottom_sheet_grid)) {
+                cameraSelector.setColumnCountResource(R.integer.default_bottom_sheet_grid);
+            } else {
+                cameraSelector.setColumnCount(infoList.size());
+            }
+
+            cameraSelector.grid().setListener(new BottomSheetListener() {
+                @Override
+                public void onSheetShown(@NonNull BottomSheet bottomSheet) {
+
+                }
+
+                @Override
+                public void onSheetItemSelected(@NonNull BottomSheet bottomSheet, MenuItem menuItem) {
+                    ResolveInfo resolveInfo = infoList.get(menuItem.getItemId());
+
+                    launchPackage(resolveInfo.activityInfo.packageName);
+
+                    PreferencesManager.putString(getString(R.string.default_camera), resolveInfo.activityInfo.packageName);
+                }
+
+                @Override
+                public void onSheetDismissed(@NonNull BottomSheet bottomSheet, @DismissEvent int i) {
+
+                }
+            }).create();
+
+            if (infoList.size() == 1) {
+                launchPackage(infoList.get(0).activityInfo.packageName);
+            } else {
+                cameraSelector.show();
+            }
+        }
+    }
+
+    @Override
+    public void launchPackage(String packageName) {
+        Intent launchPackage = getPackageManager().getLaunchIntentForPackage(packageName);
+        startActivity(launchPackage);
     }
 
     @Override
     public void onCentreButtonClick() {
-        if (!appPermissions.hasPermission(Manifest.permission.CAMERA)) {
-            appPermissions.requestPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_RC);
-        } else {
-            launchCamera();
-        }
+        iGalleryPresenter.onCentreButtonClick(appPermissions);
     }
 
     @Override
     public void onItemClick(int itemIndex, String itemName) {
-        switch (itemIndex) {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                if (isSearchViewDisplayed) {
-                    hideSearchView();
-                } else {
-                    showSearchView();
-                }
-                break;
-            case 3:
-                break;
-        }
+        iGalleryPresenter.onItemClick(itemIndex, itemName);
     }
 
     @Override
     public void onItemReselected(int itemIndex, String itemName) {
-        switch (itemIndex) {
-            case 0:
-
-                break;
-            case 1:
-
-                break;
-            case 2:
-                if (isSearchViewDisplayed) {
-                    hideSearchView();
-                } else {
-                    showSearchView();
-                }
-                break;
-            case 3:
-
-                break;
-        }
+        iGalleryPresenter.onItemClick(itemIndex, itemName);
     }
 }

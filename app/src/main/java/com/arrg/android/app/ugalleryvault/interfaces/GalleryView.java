@@ -7,6 +7,8 @@ public interface GalleryView {
 
     void configViews();
 
+    void switchSearchView();
+
     void showSearchView();
 
     void hideSearchView();
@@ -22,4 +24,6 @@ public interface GalleryView {
     void showEmptyView();
 
     void launchCamera();
+
+    void launchPackage(String packageName);
 }
