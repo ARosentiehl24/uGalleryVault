@@ -1,5 +1,6 @@
 package com.arrg.android.app.ugalleryvault.view.adapter;
 
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -49,11 +50,11 @@ public class GalleryAdapter extends MultiChoiceAdapter<GalleryAdapter.ViewHolder
 
         Glide.with(fragmentActivity).load(phoneAlbum.getCoverMedia()).crossFade().into(holder.ivCover);
 
-        holder.container.setLayoutParams(new CardView.LayoutParams(width / 3, Math.round((width / 3) * 1.5f)));
+        holder.container.setLayoutParams(new CardView.LayoutParams(width / fragmentActivity.getResources().getInteger(R.integer.grid_count_gallery), Math.round((width / fragmentActivity.getResources().getInteger(R.integer.grid_count_gallery)) * 1.5f)));
         holder.tvAlbumName.setText(phoneAlbum.getAlbumName());
         holder.tvNumberOfFiles.setText(String.format(Locale.US, "(%d)", phoneAlbum.getPhoneMedias().size()));
 
-        if (phoneAlbum.getPhoneMedias().get(0).getMediaType() == 3) {
+        if (phoneAlbum.getPhoneMedias().get(0).getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
             holder.ivPlay.setVisibility(View.VISIBLE);
         }
     }

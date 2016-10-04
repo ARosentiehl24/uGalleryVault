@@ -140,7 +140,7 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
             } else {
                 GalleryAdapter galleryAdapter = new GalleryAdapter(getActivity(), albumArrayList);
                 gallery.setAdapter(galleryAdapter);
-                gallery.setRecyclerColumnNumber(3);
+                gallery.setRecyclerColumnNumber(getResources().getInteger(R.integer.grid_count_gallery));
 
                 for (PhoneAlbum album : albumArrayList) {
                     Log.e(getClass().getSimpleName(), "" + album.getAlbumName() + " - " + album.getPhoneMedias().size());

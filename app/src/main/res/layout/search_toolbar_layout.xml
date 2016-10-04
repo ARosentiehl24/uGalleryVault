@@ -44,8 +44,7 @@
                 android:hint="@string/search"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:maxLines="1"
-                android:textColor="@color/primary_text_color" />
+                android:maxLines="1" />
         </LinearLayout>
     </io.codetail.widget.RevealFrameLayout>
 
