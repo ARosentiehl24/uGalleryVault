@@ -51,6 +51,7 @@ dependencies {
     compile 'com.andrognito.pinlockview:pinlockview:1.0.1'
 
     compile 'com.davidecirillo.multichoicerecyclerview:multichoicerecyclerview:1.1.6'
+    compile 'com.drivemode:mediafacade-audio:0.1.0@aar'
     compile 'com.drivemode:mediafacade-image:0.1.0@aar'
     compile 'com.drivemode:mediafacade-video:0.1.0@aar'
 

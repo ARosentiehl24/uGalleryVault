@@ -4,7 +4,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
@@ -14,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +29,7 @@ import com.arrg.android.app.ugalleryvault.R;
 import com.arrg.android.app.ugalleryvault.UGalleryApp;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryView;
 import com.arrg.android.app.ugalleryvault.presenter.IGalleryPresenter;
+import com.drivemode.media.image.ImageFacade;
 import com.example.jackmiras.placeholderj.library.PlaceHolderJ;
 import com.jaouan.revealator.Revealator;
 import com.kennyc.bottomsheet.BottomSheet;
@@ -157,6 +161,50 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
         spaceNavigationView.setSpaceOnClickListener(this);
 
         if (appPermissions.hasPermission(STORAGE_PERMISSIONS)) {
+            ImageFacade imageFacade = ImageFacade.getInstance(this);
+
+            String[] projection = new String[]{
+                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+                    MediaStore.Images.Media.DATA,
+                    MediaStore.Images.Media._ID
+            };
+
+            Uri externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+            Cursor cursor = getContentResolver().query(externalContentUri,
+                    projection, // Which columns to return
+                    null,       // Which rows to return (all rows)
+                    null,       // Selection arguments (none)
+                    MediaStore.Images.Media.DATE_TAKEN + " DESC"        // Ordering
+            );
+
+            if (cursor != null && cursor.getCount() > 0) {
+                Log.i("DeviceImageManager", " query count=" + cursor.getCount());
+
+                if (cursor.moveToFirst()) {
+                    String albumName;
+                    String albumFiles;
+                    String imageId;
+
+                    int bucketNameColumn = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+
+                    int imageUriColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+
+                    int imageIdColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+
+                    while (cursor.moveToNext()) {
+                        albumName = cursor.getString(bucketNameColumn);
+                        albumFiles = cursor.getString(imageUriColumn);
+                        imageId = cursor.getString(imageIdColumn);
+
+                        Log.e(getClass().getSimpleName(), albumFiles);
+                    }
+                }
+            }
+
+            assert cursor != null;
+            cursor.close();
+
             showEmptyView();
         } else {
             appPermissions.requestPermission(STORAGE_PERMISSIONS, STORAGE_PERMISSION_RC);
@@ -245,8 +293,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
             launchPackage(defaultCamera);
         } else {
             BottomSheet.Builder cameraSelector = new BottomSheet.Builder(this);
-            Intent imageCapture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
+            Intent imageCapture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             Integer id = 0;
 
             infoList = getPackageManager().queryIntentActivities(imageCapture, 0);

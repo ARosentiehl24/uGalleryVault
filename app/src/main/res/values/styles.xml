@@ -19,7 +19,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppTheme.Toolbar" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:textColorPrimary">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/md_grey_900</item>
         <item name="android:textColorSecondary">@color/colorAccent</item>
     </style>
 </resources>

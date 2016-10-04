@@ -2,11 +2,16 @@ package com.arrg.android.app.ugalleryvault.presenter;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 import com.arrg.android.app.ugalleryvault.R;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryPresenter;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryView;
+import com.arrg.android.app.ugalleryvault.model.entity.PhoneAlbum;
 import com.arrg.android.app.ugalleryvault.view.activity.GalleryActivity;
+import com.drivemode.media.image.ImageFacade;
 import com.mukesh.permissions.AppPermissions;
 
 import java.util.ArrayList;
@@ -76,7 +81,8 @@ public class IGalleryPresenter implements GalleryPresenter {
                 if (permissionResults.contains(PackageManager.PERMISSION_DENIED)) {
                     galleryView.showEmptyView();
                 } else {
-                    galleryView.launchCamera();
+                    galleryView.showEmptyView();
+                    //galleryView.launchCamera();
                 }
 
                 break;
@@ -84,4 +90,14 @@ public class IGalleryPresenter implements GalleryPresenter {
 
         permissionResults.clear();
     }
+
+    @Override
+    public ArrayList<PhoneAlbum> getPhoneAlbums(ImageFacade imageFacade) {
+
+
+
+        return null;
+    }
+
+
 }

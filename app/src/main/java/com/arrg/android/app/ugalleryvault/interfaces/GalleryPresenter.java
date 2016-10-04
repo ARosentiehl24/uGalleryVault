@@ -1,6 +1,10 @@
 package com.arrg.android.app.ugalleryvault.interfaces;
 
+import com.arrg.android.app.ugalleryvault.model.entity.PhoneAlbum;
+import com.drivemode.media.image.ImageFacade;
 import com.mukesh.permissions.AppPermissions;
+
+import java.util.ArrayList;
 
 public interface GalleryPresenter {
 
@@ -12,4 +16,5 @@ public interface GalleryPresenter {
 
     void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults);
 
+    ArrayList<PhoneAlbum> getPhoneAlbums(ImageFacade imageFacade);
 }
