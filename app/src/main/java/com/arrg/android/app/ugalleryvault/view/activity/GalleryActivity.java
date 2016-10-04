@@ -1,36 +1,33 @@
 package com.arrg.android.app.ugalleryvault.view.activity;
 
-import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.arrg.android.app.ugalleryvault.R;
-import com.arrg.android.app.ugalleryvault.UGalleryApp;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryView;
 import com.arrg.android.app.ugalleryvault.presenter.IGalleryPresenter;
-import com.drivemode.media.image.ImageFacade;
-import com.example.jackmiras.placeholderj.library.PlaceHolderJ;
+import com.arrg.android.app.ugalleryvault.view.fragment.GalleryFragment;
 import com.jaouan.revealator.Revealator;
 import com.kennyc.bottomsheet.BottomSheet;
 import com.kennyc.bottomsheet.BottomSheetListener;
@@ -38,7 +35,6 @@ import com.kennyc.bottomsheet.menu.BottomSheetMenuItem;
 import com.luseen.spacenavigation.SpaceItem;
 import com.luseen.spacenavigation.SpaceNavigationView;
 import com.luseen.spacenavigation.SpaceOnClickListener;
-import com.mukesh.permissions.AppPermissions;
 import com.shawnlin.preferencesmanager.PreferencesManager;
 
 import org.fingerlinks.mobile.android.navigator.Navigator;
@@ -53,19 +49,10 @@ import static com.arrg.android.app.ugalleryvault.UGalleryApp.DURATIONS_OF_ANIMAT
 
 public class GalleryActivity extends AppCompatActivity implements GalleryView, SpaceOnClickListener {
 
-    public static final int CAMERA_PERMISSION_RC = 100;
-    public static final int STORAGE_PERMISSION_RC = 101;
-
-    public static final String[] STORAGE_PERMISSIONS = {
-            Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
-
-    private AppPermissions appPermissions;
     private Boolean isModePrivateEnabled = false;
     private Boolean isSearchViewDisplayed = false;
     private IGalleryPresenter iGalleryPresenter;
     private List<ResolveInfo> infoList;
-    private PlaceHolderJ placeHolderJ;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -73,8 +60,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     AppCompatEditText searchView;
     @BindView(R.id.revealView)
     LinearLayout revealView;
-    @BindView(R.id.gallery)
-    RecyclerView gallery;
     @BindView(R.id.spaceNavigationView)
     SpaceNavigationView spaceNavigationView;
 
@@ -86,13 +71,14 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
 
         setSupportActionBar(toolbar);
 
-        appPermissions = new AppPermissions(this);
-
-        placeHolderJ = new PlaceHolderJ(this, R.id.gallery, UGalleryApp.getPlaceHolderManager());
-        placeHolderJ.init(R.id.view_loading, R.id.view_empty, R.id.view_error);
-        placeHolderJ.showLoading();
-
         spaceNavigationView.initWithSaveInstanceState(savedInstanceState);
+
+        MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+            public void onScanCompleted(String path, Uri uri) {
+                Log.i("ExternalStorage", "Scanned " + path + ":");
+                Log.i("ExternalStorage", "-> uri=" + uri);
+            }
+        });
 
         iGalleryPresenter = new IGalleryPresenter(this);
         iGalleryPresenter.onCreate();
@@ -120,11 +106,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         iGalleryPresenter.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -143,8 +124,12 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
 
     @Override
     public void configViews() {
-        ((Button) placeHolderJ.viewEmpty.getRootView().findViewById(R.id.button_empty_try_again)).setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
-        ((Button) placeHolderJ.viewError.getRootView().findViewById(R.id.button_error_try_again)).setTextColor(ContextCompat.getColor(this, R.color.colorAccent));
+        Navigator.with(this)
+                .build()
+                .goTo(new GalleryFragment(), R.id.container)
+                .tag(GalleryFragment.class.getSimpleName())
+                .replace()
+                .commit();
 
         spaceNavigationView.addSpaceItem(new SpaceItem(getString(R.string.space_nv_item_home), R.drawable.ic_home_black_24dp));
         spaceNavigationView.addSpaceItem(new SpaceItem(getString(R.string.space_nv_item_favorite), R.drawable.ic_favorite_black_24dp));
@@ -159,56 +144,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
         spaceNavigationView.setActiveSpaceItemColor(ContextCompat.getColor(this, R.color.colorPrimary));
         spaceNavigationView.setInActiveSpaceItemColor(ContextCompat.getColor(this, R.color.colorPrimary));
         spaceNavigationView.setSpaceOnClickListener(this);
-
-        if (appPermissions.hasPermission(STORAGE_PERMISSIONS)) {
-            ImageFacade imageFacade = ImageFacade.getInstance(this);
-
-            String[] projection = new String[]{
-                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
-                    MediaStore.Images.Media.DATA,
-                    MediaStore.Images.Media._ID
-            };
-
-            Uri externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-            Cursor cursor = getContentResolver().query(externalContentUri,
-                    projection, // Which columns to return
-                    null,       // Which rows to return (all rows)
-                    null,       // Selection arguments (none)
-                    MediaStore.Images.Media.DATE_TAKEN + " DESC"        // Ordering
-            );
-
-            if (cursor != null && cursor.getCount() > 0) {
-                Log.i("DeviceImageManager", " query count=" + cursor.getCount());
-
-                if (cursor.moveToFirst()) {
-                    String albumName;
-                    String albumFiles;
-                    String imageId;
-
-                    int bucketNameColumn = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-                    int imageUriColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-
-                    int imageIdColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-
-                    while (cursor.moveToNext()) {
-                        albumName = cursor.getString(bucketNameColumn);
-                        albumFiles = cursor.getString(imageUriColumn);
-                        imageId = cursor.getString(imageIdColumn);
-
-                        Log.e(getClass().getSimpleName(), albumFiles);
-                    }
-                }
-            }
-
-            assert cursor != null;
-            cursor.close();
-
-            showEmptyView();
-        } else {
-            appPermissions.requestPermission(STORAGE_PERMISSIONS, STORAGE_PERMISSION_RC);
-        }
     }
 
     @Override
@@ -280,12 +215,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     }
 
     @Override
-    public void showEmptyView() {
-        placeHolderJ.hideLoading();
-        placeHolderJ.showEmpty(null);
-    }
-
-    @Override
     public void launchCamera() {
         String defaultCamera = PreferencesManager.getString(getString(R.string.default_camera));
 
@@ -352,8 +281,13 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     }
 
     @Override
+    public Activity getContext() {
+        return this;
+    }
+
+    @Override
     public void onCentreButtonClick() {
-        iGalleryPresenter.onCentreButtonClick(appPermissions);
+        iGalleryPresenter.onCentreButtonClick();
     }
 
     @Override

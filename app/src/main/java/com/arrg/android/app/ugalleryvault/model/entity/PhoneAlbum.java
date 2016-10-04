@@ -6,14 +6,14 @@ public class PhoneAlbum {
 
     private Integer id;
     private String albumName;
-    private String coverPhoto;
-    private ArrayList<PhonePhoto> phonePhotos;
+    private String coverMedia;
+    private ArrayList<PhoneMedia> phoneMedias;
 
-    public PhoneAlbum(Integer id, String albumName, String coverPhoto, ArrayList<PhonePhoto> phonePhotos) {
+    public PhoneAlbum(Integer id, String albumName, String coverMedia) {
         this.id = id;
         this.albumName = albumName;
-        this.coverPhoto = coverPhoto;
-        this.phonePhotos = phonePhotos;
+        this.coverMedia = coverMedia;
+        this.phoneMedias = new ArrayList<>();
     }
 
     public Integer getId() {
@@ -32,19 +32,19 @@ public class PhoneAlbum {
         this.albumName = albumName;
     }
 
-    public String getCoverPhoto() {
-        return coverPhoto;
+    public String getCoverMedia() {
+        return coverMedia;
     }
 
-    public void setCoverPhoto(String coverPhoto) {
-        this.coverPhoto = coverPhoto;
+    public void setCoverMedia(String coverMedia) {
+        this.coverMedia = coverMedia;
     }
 
-    public ArrayList<PhonePhoto> getPhonePhotos() {
-        return phonePhotos;
+    public ArrayList<PhoneMedia> getPhoneMedias() {
+        return phoneMedias;
     }
 
-    public void setPhonePhotos(ArrayList<PhonePhoto> phonePhotos) {
-        this.phonePhotos = phonePhotos;
+    public void setPhoneMedias(ArrayList<PhoneMedia> phoneMedias) {
+        this.phoneMedias = phoneMedias;
     }
 }

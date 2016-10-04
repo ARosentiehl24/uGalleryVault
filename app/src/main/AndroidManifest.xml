@@ -17,6 +17,7 @@
     <uses-permission-sdk-23 android:name="android.permission.VIBRATE"/>
     <uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
+
     <application
         android:name=".UGalleryApp"
         android:allowBackup="true"
