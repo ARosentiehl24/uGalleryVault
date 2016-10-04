@@ -57,6 +57,7 @@ public class IGalleryPresenter implements GalleryPresenter {
                 galleryView.switchSearchView();
                 break;
             case 3:
+                
                 break;
         }
     }
@@ -85,7 +86,6 @@ public class IGalleryPresenter implements GalleryPresenter {
 
     @Override
     public ArrayList<PhoneAlbum> getPhoneAlbums(ImageFacade imageFacade) {
-
 
 
         return null;

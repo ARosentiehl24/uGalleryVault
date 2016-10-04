@@ -121,7 +121,7 @@ public class IGalleryFragmentPresenter implements GalleryFragmentPresenter {
                 Integer folderId;
                 String data;
                 Long dateAdded;
-                String mediaType;
+                Integer mediaType;
                 String mimeType;
                 String title;
 
@@ -133,12 +133,12 @@ public class IGalleryFragmentPresenter implements GalleryFragmentPresenter {
                 int mimeTypeColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE);
                 int titleColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.TITLE);
 
-                while (cursor.moveToNext()) {
+                do {
                     id = cursor.getInt(idColumn);
                     folderId = cursor.getInt(folderIdColumn);
                     data = cursor.getString(dataColumn);
                     dateAdded = cursor.getLong(dateAddedColumn);
-                    mediaType = cursor.getString(mediaTypeColumn);
+                    mediaType = cursor.getInt(mediaTypeColumn);
                     mimeType = cursor.getString(mimeTypeColumn);
                     title = cursor.getString(titleColumn);
 
@@ -173,7 +173,8 @@ public class IGalleryFragmentPresenter implements GalleryFragmentPresenter {
                     }
 
                     Log.e(getClass().getSimpleName(), id + " - " + albumName + " - " + data + " - " + date + " - " + mediaType + " - " + mimeType + " - " + title);
-                }
+
+                } while (cursor.moveToNext());
             }
         }
 
