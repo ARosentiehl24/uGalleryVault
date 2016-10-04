@@ -77,6 +77,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.mukesh:permissions:1.0.3'
     compile 'com.shawnlin:PreferencesManager:1.0.2'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.zhy:autolayout:1.4.5'
     compile 'net.yslibrary.licenseadapter:licenseadapter:1.2.4'
     compile 'org.fingerlinks.mobile.android:Navigator:0.1.5'

@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -16,7 +14,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +23,7 @@ import android.widget.Toast;
 
 import com.arrg.android.app.ugalleryvault.R;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryView;
+import com.arrg.android.app.ugalleryvault.model.service.UriObserver;
 import com.arrg.android.app.ugalleryvault.presenter.IGalleryPresenter;
 import com.arrg.android.app.ugalleryvault.view.fragment.GalleryFragment;
 import com.jaouan.revealator.Revealator;
@@ -54,6 +52,9 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     private IGalleryPresenter iGalleryPresenter;
     private List<ResolveInfo> infoList;
 
+    Handler handler;
+    UriObserver observer;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.searchView)
@@ -73,15 +74,20 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
 
         spaceNavigationView.initWithSaveInstanceState(savedInstanceState);
 
-        MediaScannerConnection.scanFile(this, new String[]{Environment.getExternalStorageDirectory().toString()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-            public void onScanCompleted(String path, Uri uri) {
-                Log.i("ExternalStorage", "Scanned " + path + ":");
-                Log.i("ExternalStorage", "-> uri=" + uri);
-            }
-        });
+        handler = new Handler();
+        observer = new UriObserver(handler, this);
+
+        this.getContentResolver().registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true, observer);
 
         iGalleryPresenter = new IGalleryPresenter(this);
         iGalleryPresenter.onCreate();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        this.getContentResolver().unregisterContentObserver(observer);
     }
 
     @Override

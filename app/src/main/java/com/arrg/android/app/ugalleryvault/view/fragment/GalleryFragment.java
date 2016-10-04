@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.GridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +22,7 @@ import com.arrg.android.app.ugalleryvault.interfaces.GalleryFragmentView;
 import com.arrg.android.app.ugalleryvault.model.entity.PhoneAlbum;
 import com.arrg.android.app.ugalleryvault.presenter.IGalleryFragmentPresenter;
 import com.arrg.android.app.ugalleryvault.view.adapter.GalleryAdapter;
+import com.davidecirillo.multichoicerecyclerview.MultiChoiceRecyclerView;
 import com.example.jackmiras.placeholderj.library.PlaceHolderJ;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import butterknife.ButterKnife;
 public class GalleryFragment extends Fragment implements GalleryFragmentView {
 
     @BindView(R.id.gallery)
-    RecyclerView gallery;
+    MultiChoiceRecyclerView gallery;
 
     private IGalleryFragmentPresenter iGalleryFragmentPresenter;
     private PlaceHolderJ placeHolderJ;
@@ -138,9 +139,10 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
                     }
                 });
             } else {
-                GalleryAdapter galleryAdapter = new GalleryAdapter();
-
-                showMessage(albumArrayList.size() + " files");
+                GalleryAdapter galleryAdapter = new GalleryAdapter(getActivity(), albumArrayList);
+                gallery.setAdapter(galleryAdapter);
+                gallery.setHasFixedSize(true);
+                gallery.setLayoutManager(new GridLayoutManager(getActivity(), 3));
 
                 for (PhoneAlbum album : albumArrayList) {
                     Log.e(getClass().getSimpleName(), "" + album.getAlbumName() + " - " + album.getPhoneMedias().size());
