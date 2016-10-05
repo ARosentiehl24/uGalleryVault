@@ -1,6 +1,5 @@
 package com.arrg.android.app.ugalleryvault.view.adapter;
 
-import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -12,10 +11,10 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.dragselectrecyclerview.DragSelectRecyclerViewAdapter;
 import com.arrg.android.app.ugalleryvault.R;
 import com.arrg.android.app.ugalleryvault.model.entity.PhoneAlbum;
 import com.bumptech.glide.Glide;
-import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -23,13 +22,24 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class GalleryAdapter extends MultiChoiceAdapter<GalleryAdapter.ViewHolder> {
+public class GalleryAdapter extends DragSelectRecyclerViewAdapter<GalleryAdapter.ViewHolder> {
 
-    private FragmentActivity fragmentActivity;
+    public interface OnItemClickListener {
+        void onItemClick(ViewHolder viewHolder, View itemView, int position);
+
+        void onLongItemClick(ViewHolder viewHolder, View itemView, int position);
+    }
+
+    public static final String MTV_REG = "^.*\\.(mp4|3gp)$";
+    public static final String MP3_REG = "^.*\\.(mp3|wav)$";
+    public static final String JPG_REG = "^.*\\.(gif|jpg|png)$";
+
     private ArrayList<PhoneAlbum> phoneAlbumArrayList;
     private DisplayMetrics displaymetrics;
+    private FragmentActivity fragmentActivity;
     private Integer height;
     private Integer width;
+    private OnItemClickListener onItemClickListener;
 
     public GalleryAdapter(FragmentActivity fragmentActivity, ArrayList<PhoneAlbum> phoneAlbumArrayList) {
         this.fragmentActivity = fragmentActivity;
@@ -54,14 +64,17 @@ public class GalleryAdapter extends MultiChoiceAdapter<GalleryAdapter.ViewHolder
         holder.tvAlbumName.setText(phoneAlbum.getAlbumName());
         holder.tvNumberOfFiles.setText(String.format(Locale.US, "(%d)", phoneAlbum.getPhoneMedias().size()));
 
-        if (phoneAlbum.getPhoneMedias().get(0).getMediaType() == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
+        if (phoneAlbum.getCoverMedia().matches(MTV_REG)) {
             holder.ivPlay.setVisibility(View.VISIBLE);
         }
+
+        holder.cbIsSelected.setVisibility(isIndexSelected(position) ? View.VISIBLE : View.INVISIBLE);
+        holder.cbIsSelected.setChecked(phoneAlbum.getSelected());
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_item_layout, parent, false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_item_layout, parent, false), onItemClickListener);
     }
 
     @Override
@@ -69,22 +82,21 @@ public class GalleryAdapter extends MultiChoiceAdapter<GalleryAdapter.ViewHolder
         return phoneAlbumArrayList.size();
     }
 
-    @Override
-    protected void setActive(View view, boolean state) {
-        super.setActive(view, state);
+    public PhoneAlbum getAlbum(int position) {
+        return phoneAlbumArrayList.get(position);
     }
 
-    @Override
-    protected View.OnClickListener defaultItemViewClickListener(ViewHolder holder, int position) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        };
+    public void setChecked(int position, boolean isChecked) {
+        phoneAlbumArrayList.get(position).setSelected(isChecked);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
+        private OnItemClickListener onItemClickListener;
 
         @BindView(R.id.card_container)
         CardView container;
@@ -104,9 +116,28 @@ public class GalleryAdapter extends MultiChoiceAdapter<GalleryAdapter.ViewHolder
         @BindView(R.id.cbIsSelected)
         CheckBox cbIsSelected;
 
-        ViewHolder(View itemView) {
+        ViewHolder(View itemView, OnItemClickListener onItemClickListener) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            this.onItemClickListener = onItemClickListener;
+            this.itemView.setOnClickListener(this);
+            this.itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(this, itemView, getAdapterPosition());
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (onItemClickListener != null) {
+                onItemClickListener.onLongItemClick(this, itemView, getAdapterPosition());
+            }
+            return true;
         }
     }
 }

@@ -51,6 +51,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support:support-vector-drawable:24.2.1'
+    compile 'com.afollestad:material-cab:0.1.12'
+    compile 'com.afollestad:drag-select-recyclerview:0.3.6'
     compile 'com.amitshekhar.android:glide-bitmap-pool:0.0.1'
     compile 'com.andrognito.pinlockview:pinlockview:1.0.1'
     compile 'com.davidecirillo.multichoicerecyclerview:multichoicerecyclerview:1.1.6'

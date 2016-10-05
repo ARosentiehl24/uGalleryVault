@@ -8,12 +8,14 @@ public class PhoneAlbum {
     private String albumName;
     private String coverMedia;
     private ArrayList<PhoneMedia> phoneMedias;
+    private Boolean isSelected;
 
     public PhoneAlbum(Integer id, String albumName, String coverMedia) {
         this.id = id;
         this.albumName = albumName;
         this.coverMedia = coverMedia;
         this.phoneMedias = new ArrayList<>();
+        this.isSelected = false;
     }
 
     public Integer getId() {
@@ -46,5 +48,13 @@ public class PhoneAlbum {
 
     public void setPhoneMedias(ArrayList<PhoneMedia> phoneMedias) {
         this.phoneMedias = phoneMedias;
+    }
+
+    public Boolean getSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(Boolean selected) {
+        isSelected = selected;
     }
 }

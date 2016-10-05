@@ -8,20 +8,21 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
+import com.afollestad.dragselectrecyclerview.DragSelectRecyclerView;
 import com.arrg.android.app.ugalleryvault.R;
 import com.arrg.android.app.ugalleryvault.UGalleryApp;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryFragmentView;
 import com.arrg.android.app.ugalleryvault.model.entity.PhoneAlbum;
 import com.arrg.android.app.ugalleryvault.presenter.IGalleryFragmentPresenter;
 import com.arrg.android.app.ugalleryvault.view.adapter.GalleryAdapter;
-import com.arrg.android.app.ugalleryvault.view.ui.AutoFitRecyclerView;
 import com.example.jackmiras.placeholderj.library.PlaceHolderJ;
 
 import java.util.ArrayList;
@@ -35,10 +36,12 @@ import butterknife.ButterKnife;
 public class GalleryFragment extends Fragment implements GalleryFragmentView {
 
     @BindView(R.id.gallery)
-    AutoFitRecyclerView gallery;
+    DragSelectRecyclerView gallery;
 
+    private GalleryAdapter galleryAdapter;
     private IGalleryFragmentPresenter iGalleryFragmentPresenter;
     private PlaceHolderJ placeHolderJ;
+    private boolean isLongClickPressed = false;
 
     public GalleryFragment() {
 
@@ -110,6 +113,16 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
         return getActivity();
     }
 
+    @Override
+    public void selectAll() {
+
+    }
+
+    @Override
+    public void unSelectAll() {
+
+    }
+
     class LoadAlbumTask extends AsyncTask<Void, Void, ArrayList<PhoneAlbum>> {
 
         @Override
@@ -138,13 +151,46 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
                     }
                 });
             } else {
-                GalleryAdapter galleryAdapter = new GalleryAdapter(getActivity(), albumArrayList);
-                gallery.setAdapter(galleryAdapter);
-                gallery.setRecyclerColumnNumber(getResources().getInteger(R.integer.grid_count_gallery));
+                galleryAdapter = new GalleryAdapter(getActivity(), albumArrayList);
+                galleryAdapter.setOnItemClickListener(new GalleryAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(GalleryAdapter.ViewHolder viewHolder, View itemView, int position) {
+                        if (isLongClickPressed) {
+                            CheckBox checkBox = (CheckBox) itemView.findViewById(R.id.cbIsSelected);
 
-                for (PhoneAlbum album : albumArrayList) {
-                    Log.e(getClass().getSimpleName(), "" + album.getAlbumName() + " - " + album.getPhoneMedias().size());
-                }
+                            checkBox.setChecked(!checkBox.isChecked());
+                            galleryAdapter.setChecked(position, checkBox.isChecked());
+                        } else {
+                            showMessage("Open Album");
+                        }
+                    }
+
+                    @Override
+                    public void onLongItemClick(GalleryAdapter.ViewHolder viewHolder, View itemView, int position) {
+                        if (isLongClickPressed) {
+                            isLongClickPressed = false;
+
+                            galleryAdapter.clearSelected();
+
+                            for (int i = 0; i < galleryAdapter.getItemCount(); i++) {
+                                galleryAdapter.setChecked(i, false);
+                            }
+                        } else {
+                            isLongClickPressed = true;
+
+                            CheckBox checkBox = (CheckBox) itemView.findViewById(R.id.cbIsSelected);
+
+                            checkBox.setChecked(!checkBox.isChecked());
+                            galleryAdapter.setChecked(position, checkBox.isChecked());
+
+                            for (int i = 0; i < galleryAdapter.getItemCount(); i++) {
+                                galleryAdapter.setSelected(i, true);
+                            }
+                        }
+                    }
+                });
+                gallery.setAdapter(galleryAdapter);
+                gallery.setLayoutManager(new GridLayoutManager(getContext(), getResources().getInteger(R.integer.grid_count_gallery)));
             }
         }
     }

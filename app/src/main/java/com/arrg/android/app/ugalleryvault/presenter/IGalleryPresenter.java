@@ -1,15 +1,17 @@
 package com.arrg.android.app.ugalleryvault.presenter;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 
 import com.arrg.android.app.ugalleryvault.R;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryPresenter;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryView;
-import com.arrg.android.app.ugalleryvault.model.entity.PhoneAlbum;
-import com.drivemode.media.image.ImageFacade;
+import com.arrg.android.app.ugalleryvault.view.fragment.GalleryFragment;
 import com.mukesh.permissions.AppPermissions;
+
+import org.fingerlinks.mobile.android.navigator.Navigator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,8 @@ public class IGalleryPresenter implements GalleryPresenter {
     private static final int CAMERA_PERMISSION_RC = 100;
 
     private AppPermissions appPermissions;
+    private Boolean isAllSelected = false;
+    private Boolean isSearchViewDisplayed = false;
     private GalleryView galleryView;
 
     public IGalleryPresenter(GalleryView galleryView) {
@@ -33,8 +37,14 @@ public class IGalleryPresenter implements GalleryPresenter {
     }
 
     @Override
-    public Activity getContext() {
-        return galleryView.getContext();
+    public void onBackPressed() {
+        if (isSearchViewDisplayed) {
+            isSearchViewDisplayed = false;
+
+            galleryView.hideSearchView();
+        } else {
+            Navigator.with(getContext()).utils().finishWithAnimation(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
     }
 
     @Override
@@ -54,10 +64,29 @@ public class IGalleryPresenter implements GalleryPresenter {
             case 1:
                 break;
             case 2:
-                galleryView.switchSearchView();
+                if (isSearchViewDisplayed) {
+                    isSearchViewDisplayed = false;
+
+                    galleryView.hideSearchView();
+                } else {
+                    isSearchViewDisplayed = true;
+
+                    galleryView.showSearchView();
+                }
                 break;
             case 3:
-                
+                GalleryFragment galleryFragment = (GalleryFragment) getFragment(GalleryFragment.class);
+                if (isNotNull(galleryFragment)) {
+                    if (isAllSelected) {
+                        isAllSelected = false;
+
+                        galleryFragment.unSelectAll();
+                    } else {
+                        isAllSelected = true;
+
+                        galleryFragment.selectAll();
+                    }
+                }
                 break;
         }
     }
@@ -85,11 +114,16 @@ public class IGalleryPresenter implements GalleryPresenter {
     }
 
     @Override
-    public ArrayList<PhoneAlbum> getPhoneAlbums(ImageFacade imageFacade) {
-
-
-        return null;
+    public AppCompatActivity getContext() {
+        return galleryView.getContext();
     }
 
-
+    @Override
+    public Fragment getFragment(Class fragmentClass) {
+        return getContext().getSupportFragmentManager().findFragmentByTag(fragmentClass.getSimpleName());
+    }
+    @Override
+    public Boolean isNotNull(Object o) {
+        return o != null;
+    }
 }

@@ -1,6 +1,5 @@
 package com.arrg.android.app.ugalleryvault.view.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
@@ -48,12 +47,10 @@ import static com.arrg.android.app.ugalleryvault.UGalleryApp.DURATIONS_OF_ANIMAT
 public class GalleryActivity extends AppCompatActivity implements GalleryView, SpaceOnClickListener {
 
     private Boolean isModePrivateEnabled = false;
-    private Boolean isSearchViewDisplayed = false;
+    private Handler handler;
     private IGalleryPresenter iGalleryPresenter;
     private List<ResolveInfo> infoList;
-
-    Handler handler;
-    UriObserver observer;
+    private UriObserver uriObserver;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -75,9 +72,9 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
         spaceNavigationView.initWithSaveInstanceState(savedInstanceState);
 
         handler = new Handler();
-        observer = new UriObserver(handler, this);
+        uriObserver = new UriObserver(handler, this);
 
-        this.getContentResolver().registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true, observer);
+        this.getContentResolver().registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true, uriObserver);
 
         iGalleryPresenter = new IGalleryPresenter(this);
         iGalleryPresenter.onCreate();
@@ -87,16 +84,12 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     protected void onDestroy() {
         super.onDestroy();
 
-        this.getContentResolver().unregisterContentObserver(observer);
+        this.getContentResolver().unregisterContentObserver(uriObserver);
     }
 
     @Override
     public void onBackPressed() {
-        if (isSearchViewDisplayed) {
-            hideSearchView();
-        } else {
-            Navigator.with(this).utils().finishWithAnimation(android.R.anim.fade_in, android.R.anim.fade_out);
-        }
+        iGalleryPresenter.onBackPressed();
     }
 
     @Override
@@ -153,15 +146,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     }
 
     @Override
-    public void switchSearchView() {
-        if (isSearchViewDisplayed) {
-            hideSearchView();
-        } else {
-            showSearchView();
-        }
-    }
-
-    @Override
     public void showSearchView() {
         Revealator.reveal(revealView)
                 .withRevealDuration(DURATIONS_OF_ANIMATIONS)
@@ -171,8 +155,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
-                        isSearchViewDisplayed = true;
-
                         searchView.requestFocus();
 
                         showKeyboard(searchView, getApplicationContext());
@@ -188,8 +170,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
-                        isSearchViewDisplayed = false;
-
                         searchView.getText().clear();
 
                         hideKeyboard(searchView, getApplicationContext());
@@ -287,7 +267,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
     }
 
     @Override
-    public Activity getContext() {
+    public AppCompatActivity getContext() {
         return this;
     }
 

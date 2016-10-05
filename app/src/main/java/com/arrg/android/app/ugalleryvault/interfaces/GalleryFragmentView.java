@@ -18,4 +18,8 @@ public interface GalleryFragmentView {
     void rqPermission(String[] permissions, int rc);
 
     FragmentActivity getFragmentContext();
+
+    void selectAll();
+
+    void unSelectAll();
 }

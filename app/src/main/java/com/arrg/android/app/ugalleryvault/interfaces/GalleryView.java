@@ -1,14 +1,12 @@
 package com.arrg.android.app.ugalleryvault.interfaces;
 
-import android.app.Activity;
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 public interface GalleryView {
 
     void configViews();
-
-    void switchSearchView();
 
     void showSearchView();
 
@@ -26,5 +24,5 @@ public interface GalleryView {
 
     void launchPackage(String packageName);
 
-    Activity getContext();
+    AppCompatActivity getContext();
 }
