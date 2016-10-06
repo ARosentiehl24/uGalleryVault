@@ -24,8 +24,6 @@ import butterknife.ButterKnife;
 
 public class GalleryAdapter extends DragSelectRecyclerViewAdapter<GalleryAdapter.ViewHolder> {
 
-
-
     public interface OnItemClickListener {
         void onItemClick(ViewHolder viewHolder, View itemView, int position);
 

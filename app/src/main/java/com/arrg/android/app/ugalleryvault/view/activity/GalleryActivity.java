@@ -13,6 +13,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +28,7 @@ import com.arrg.android.app.ugalleryvault.interfaces.GalleryView;
 import com.arrg.android.app.ugalleryvault.model.service.UriObserver;
 import com.arrg.android.app.ugalleryvault.presenter.IGalleryPresenter;
 import com.arrg.android.app.ugalleryvault.view.fragment.GalleryFragment;
+import com.arrg.android.app.ugalleryvault.view.fragment.MediaFragment;
 import com.jaouan.revealator.Revealator;
 import com.kennyc.bottomsheet.BottomSheet;
 import com.kennyc.bottomsheet.BottomSheetListener;
@@ -143,6 +147,36 @@ public class GalleryActivity extends AppCompatActivity implements GalleryView, S
         spaceNavigationView.setActiveSpaceItemColor(ContextCompat.getColor(this, R.color.colorPrimary));
         spaceNavigationView.setInActiveSpaceItemColor(ContextCompat.getColor(this, R.color.colorPrimary));
         spaceNavigationView.setSpaceOnClickListener(this);
+
+        searchView.addTextChangedListener(new TextWatcher() {
+            MediaFragment mediaFragment = (MediaFragment) iGalleryPresenter.getFragment(MediaFragment.class);
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                GalleryFragment galleryFragment = (GalleryFragment) iGalleryPresenter.getFragment(GalleryFragment.class);
+
+                if (galleryFragment != null) {
+                    Log.e(getClass().getSimpleName(), s.toString());
+
+                    galleryFragment.makeQuery(s);
+                } else if (mediaFragment != null) {
+                    /* TODO */
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 0) {
+                    GalleryFragment galleryFragment = (GalleryFragment) iGalleryPresenter.getFragment(GalleryFragment.class);
+                    galleryFragment.resetGallery();
+                }
+            }
+        });
     }
 
     @Override

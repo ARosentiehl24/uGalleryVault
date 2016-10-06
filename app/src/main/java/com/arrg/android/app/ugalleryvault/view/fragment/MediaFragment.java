@@ -12,10 +12,10 @@ import com.arrg.android.app.ugalleryvault.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PhotoFragment extends Fragment {
+public class MediaFragment extends Fragment {
 
 
-    public PhotoFragment() {
+    public MediaFragment() {
         // Required empty public constructor
     }
 
@@ -24,7 +24,7 @@ public class PhotoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_photo, container, false);
+        return inflater.inflate(R.layout.fragment_media, container, false);
     }
 
 }

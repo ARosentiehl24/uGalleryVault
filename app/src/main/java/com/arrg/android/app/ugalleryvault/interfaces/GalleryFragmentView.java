@@ -24,4 +24,8 @@ public interface GalleryFragmentView {
     void unSelectAll();
 
     void showFavorite();
+
+    void makeQuery(CharSequence s);
+
+    void resetGallery();
 }

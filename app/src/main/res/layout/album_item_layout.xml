@@ -7,12 +7,12 @@
     android:layout_margin="2.5dp"
     app:cardUseCompatPadding="true">
 
-    <LinearLayout
+    <com.zhy.autolayout.AutoLinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <FrameLayout
+        <com.zhy.autolayout.AutoFrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
@@ -35,9 +35,9 @@
                 android:src="@drawable/ic_play_circle_filled_black_36dp"
                 android:tint="#fafafa"
                 android:visibility="invisible" />
-        </FrameLayout>
+        </com.zhy.autolayout.AutoFrameLayout>
 
-        <LinearLayout
+        <com.zhy.autolayout.AutoLinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -54,8 +54,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/md_text_dark_secondary_54" />
-        </LinearLayout>
-    </LinearLayout>
+        </com.zhy.autolayout.AutoLinearLayout>
+    </com.zhy.autolayout.AutoLinearLayout>
 
     <CheckBox
         android:id="@+id/cbIsSelected"

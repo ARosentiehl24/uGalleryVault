@@ -9,6 +9,7 @@ public class PhoneMedia {
     private Integer mediaType;
     private String mimeType;
     private String title;
+    private Boolean isChecked;
 
     public PhoneMedia(Integer id, String albumName, String mediaPath, String dateAdded, Integer mediaType, String mimeType, String title) {
         this.id = id;
@@ -18,6 +19,7 @@ public class PhoneMedia {
         this.mediaType = mediaType;
         this.mimeType = mimeType;
         this.title = title;
+        this.isChecked = false;
     }
 
     public Integer getId() {
@@ -74,5 +76,13 @@ public class PhoneMedia {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Boolean getChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(Boolean checked) {
+        isChecked = checked;
     }
 }

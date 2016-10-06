@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +22,10 @@ import com.arrg.android.app.ugalleryvault.R;
 import com.arrg.android.app.ugalleryvault.UGalleryApp;
 import com.arrg.android.app.ugalleryvault.interfaces.GalleryFragmentView;
 import com.arrg.android.app.ugalleryvault.model.entity.PhoneAlbum;
+import com.arrg.android.app.ugalleryvault.model.entity.PhoneMedia;
 import com.arrg.android.app.ugalleryvault.presenter.IGalleryFragmentPresenter;
 import com.arrg.android.app.ugalleryvault.view.adapter.GalleryAdapter;
+import com.arrg.android.app.ugalleryvault.view.adapter.MediaSearchAdapter;
 import com.example.jackmiras.placeholderj.library.PlaceHolderJ;
 
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
     @BindView(R.id.gallery)
     DragSelectRecyclerView gallery;
 
+    private ArrayList<PhoneAlbum> albumArrayList;
     private GalleryAdapter galleryAdapter;
     private IGalleryFragmentPresenter iGalleryFragmentPresenter;
     private PlaceHolderJ placeHolderJ;
@@ -142,6 +146,41 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
 
     }
 
+    @Override
+    public void makeQuery(CharSequence s) {
+        ArrayList<PhoneMedia> mediaArrayList = new ArrayList<>();
+
+        for (PhoneAlbum album : albumArrayList) {
+            for (PhoneMedia media : album.getPhoneMedias()) {
+                if (media.getTitle().toUpperCase().contains(s.toString().toUpperCase())) {
+                    mediaArrayList.add(media);
+                }
+            }
+        }
+
+        MediaSearchAdapter searchAdapter = new MediaSearchAdapter(getActivity(), mediaArrayList);
+        searchAdapter.setOnItemClickListener(new MediaSearchAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(MediaSearchAdapter.ViewHolder viewHolder, View itemView, int position) {
+
+            }
+
+            @Override
+            public void onLongItemClick(MediaSearchAdapter.ViewHolder viewHolder, View itemView, int position) {
+
+            }
+        });
+
+        gallery.setAdapter(searchAdapter);
+        gallery.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+    }
+
+    @Override
+    public void resetGallery() {
+        gallery.setAdapter(galleryAdapter);
+        gallery.setLayoutManager(new GridLayoutManager(getContext(), getResources().getInteger(R.integer.grid_count_gallery)));
+    }
+
     class LoadAlbumTask extends AsyncTask<Void, Void, ArrayList<PhoneAlbum>> {
 
         @Override
@@ -153,7 +192,9 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
 
         @Override
         protected ArrayList<PhoneAlbum> doInBackground(Void... params) {
-            return iGalleryFragmentPresenter.getAlbums(getFragmentContext());
+            albumArrayList = iGalleryFragmentPresenter.getAlbums(getFragmentContext());
+
+            return albumArrayList;
         }
 
         @Override

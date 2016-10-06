@@ -6,6 +6,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.example.jackmiras.placeholderj.library.PlaceHolderManager;
 import com.shawnlin.preferencesmanager.PreferencesManager;
+import com.zhy.autolayout.config.AutoLayoutConifg;
 
 public class UGalleryApp extends Application {
 
@@ -29,6 +30,8 @@ public class UGalleryApp extends Application {
 
         preferencesManager = new PreferencesManager(this);
         setPreferencesManager(SETTINGS_PREFERENCES);
+
+        AutoLayoutConifg.getInstance().useDeviceSize();
 
         placeHolderManager = new PlaceHolderManager.Configurator()
                 .emptyBackground(R.color.colorPrimary)
