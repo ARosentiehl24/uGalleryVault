@@ -58,10 +58,20 @@ public class IGalleryPresenter implements GalleryPresenter {
 
     @Override
     public void onItemClick(int itemIndex, String itemName) {
+        GalleryFragment galleryFragment = (GalleryFragment) getFragment(GalleryFragment.class);
+
         switch (itemIndex) {
             case 0:
+                Navigator.with(getContext())
+                        .build()
+                        .goTo(new GalleryFragment(), R.id.container)
+                        .tag(GalleryFragment.class.getSimpleName())
+                        .animation(android.R.anim.fade_in, android.R.anim.fade_out)
+                        .replace()
+                        .commit();
                 break;
             case 1:
+                galleryFragment.showFavorite();
                 break;
             case 2:
                 if (isSearchViewDisplayed) {
@@ -75,7 +85,6 @@ public class IGalleryPresenter implements GalleryPresenter {
                 }
                 break;
             case 3:
-                GalleryFragment galleryFragment = (GalleryFragment) getFragment(GalleryFragment.class);
                 if (isNotNull(galleryFragment)) {
                     if (isAllSelected) {
                         isAllSelected = false;

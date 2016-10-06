@@ -22,4 +22,6 @@ public interface GalleryFragmentView {
     void selectAll();
 
     void unSelectAll();
+
+    void showFavorite();
 }

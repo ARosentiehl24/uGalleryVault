@@ -24,15 +24,17 @@ import butterknife.ButterKnife;
 
 public class GalleryAdapter extends DragSelectRecyclerViewAdapter<GalleryAdapter.ViewHolder> {
 
+
+
     public interface OnItemClickListener {
         void onItemClick(ViewHolder viewHolder, View itemView, int position);
 
         void onLongItemClick(ViewHolder viewHolder, View itemView, int position);
     }
 
-    public static final String MTV_REG = "^.*\\.(mp4|3gp)$";
-    public static final String MP3_REG = "^.*\\.(mp3|wav)$";
-    public static final String JPG_REG = "^.*\\.(gif|jpg|png)$";
+    private static final String MTV_REG = "^.*\\.(mp4|3gp)$";
+    private static final String MP3_REG = "^.*\\.(mp3|wav)$";
+    private static final String JPG_REG = "^.*\\.(gif|jpg|png)$";
 
     private ArrayList<PhoneAlbum> phoneAlbumArrayList;
     private DisplayMetrics displaymetrics;
@@ -64,12 +66,9 @@ public class GalleryAdapter extends DragSelectRecyclerViewAdapter<GalleryAdapter
         holder.tvAlbumName.setText(phoneAlbum.getAlbumName());
         holder.tvNumberOfFiles.setText(String.format(Locale.US, "(%d)", phoneAlbum.getPhoneMedias().size()));
 
-        if (phoneAlbum.getCoverMedia().matches(MTV_REG)) {
-            holder.ivPlay.setVisibility(View.VISIBLE);
-        }
-
         holder.cbIsSelected.setVisibility(isIndexSelected(position) ? View.VISIBLE : View.INVISIBLE);
         holder.cbIsSelected.setChecked(phoneAlbum.getSelected());
+        holder.ivPlay.setVisibility(phoneAlbum.getCoverMedia().matches(MTV_REG) ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override

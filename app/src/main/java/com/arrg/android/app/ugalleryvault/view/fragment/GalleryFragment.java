@@ -115,11 +115,30 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
 
     @Override
     public void selectAll() {
+        isLongClickPressed = true;
 
+        for (int i = 0; i < galleryAdapter.getItemCount(); i++) {
+            galleryAdapter.setSelected(i, true);
+        }
+
+        galleryAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void unSelectAll() {
+        isLongClickPressed = false;
+
+        galleryAdapter.clearSelected();
+
+        for (int i = 0; i < galleryAdapter.getItemCount(); i++) {
+            galleryAdapter.setChecked(i, false);
+        }
+
+        galleryAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showFavorite() {
 
     }
 
@@ -157,8 +176,8 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
                     public void onItemClick(GalleryAdapter.ViewHolder viewHolder, View itemView, int position) {
                         if (isLongClickPressed) {
                             CheckBox checkBox = (CheckBox) itemView.findViewById(R.id.cbIsSelected);
-
                             checkBox.setChecked(!checkBox.isChecked());
+
                             galleryAdapter.setChecked(position, checkBox.isChecked());
                         } else {
                             showMessage("Open Album");
@@ -168,24 +187,14 @@ public class GalleryFragment extends Fragment implements GalleryFragmentView {
                     @Override
                     public void onLongItemClick(GalleryAdapter.ViewHolder viewHolder, View itemView, int position) {
                         if (isLongClickPressed) {
-                            isLongClickPressed = false;
-
-                            galleryAdapter.clearSelected();
-
-                            for (int i = 0; i < galleryAdapter.getItemCount(); i++) {
-                                galleryAdapter.setChecked(i, false);
-                            }
+                            unSelectAll();
                         } else {
-                            isLongClickPressed = true;
-
                             CheckBox checkBox = (CheckBox) itemView.findViewById(R.id.cbIsSelected);
-
                             checkBox.setChecked(!checkBox.isChecked());
+
                             galleryAdapter.setChecked(position, checkBox.isChecked());
 
-                            for (int i = 0; i < galleryAdapter.getItemCount(); i++) {
-                                galleryAdapter.setSelected(i, true);
-                            }
+                            selectAll();
                         }
                     }
                 });
